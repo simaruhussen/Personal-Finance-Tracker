@@ -1,6 +1,5 @@
-/* ================= global palette + layout (keep your existing rules) =================
-   (This file contains both the base rules and the dark-mode overrides.)
-   Replace your current src/index.css with this file or merge the dark-block into your file.
+/* src/index.css
+   Global palette + layout with fixed sidebar/header and scrollable main area
 */
 
 /* ---------- root color palette (essential subset) ---------- */
@@ -34,16 +33,23 @@ body {
   line-height: 1.5;
 }
 
-/* ---------- layout containers ---------- */
+/* ---------- FIXED LAYOUT: sidebar + header fixed; only main scrolls ---------- */
+/* app-root uses viewport height and prevents body scroll; main content will scroll instead */
 .app-root {
-  min-height: 100%;
+  height: 100vh;              /* full viewport */
   display: flex;
   flex-direction: row;
   gap: 0;
   background: rgb(var(--background-rgb));
+  overflow: hidden;           /* avoid whole-page scrolling */
 }
 
+/* Sidebar: fixed on the left, full-height. On mobile it will be hidden by media rules. */
 .app-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
   width: var(--sidebar-width);
   min-width: var(--sidebar-width);
   max-width: var(--sidebar-width);
@@ -55,15 +61,22 @@ body {
   box-sizing: border-box;
   overflow: auto;
   color: rgb(var(--accent-rgb));
+  z-index: 30;
 }
 
+/* Right area offset to the left by the sidebar width.
+   This area contains header (sticky) and main (scrollable).
+*/
 .app-right {
+  margin-left: var(--sidebar-width);
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  height: 100vh;
+  min-height: 0; /* allow child to scroll */
 }
 
+/* Header: sticky at top of the right area */
 .app-header {
   height: var(--header-height);
   min-height: var(--header-height);
@@ -74,14 +87,18 @@ body {
   background: rgb(var(--card-rgb));
   border-bottom: 1px solid rgba(15,15,15,0.04);
   box-sizing: border-box;
-  z-index: 20;
+  z-index: 40;
+  position: sticky;
+  top: 0;
 }
 
+/* Main: ONLY this element scrolls (vertical) */
 .app-main {
   flex: 1 1 auto;
   overflow: auto;
   padding: 24px;
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- small utilities ---------- */
@@ -123,7 +140,7 @@ body {
 /* focus outline for keyboard users */
 :focus { outline: 3px solid rgba(var(--primary-rgb), 0.12); outline-offset: 2px; }
 
-/* sign-in / sign-up styles (keep as-is if you already have them) */
+/* sign-in / sign-up styles (kept intact) */
 .auth-root{
   min-height:100vh;
   display:grid;
@@ -179,16 +196,14 @@ body {
   .auth-illustration{display:none}
   .auth-card{width:100%;max-width:640px;margin:0 auto}
 }
+
+/* For narrow viewports we collapse the layout and let the header be in flow rather than the fixed left sidebar */
 @media (max-width:880px){
-  .app-root{flex-direction:column}
-  .app-sidebar{width:100%;min-width:100%;max-width:100%;border-right:none;border-bottom:1px solid rgba(15,15,15,0.04)}
-  .app-header{position:relative}
+  .app-right { margin-left: 0; }
+  .app-sidebar { position: relative; width: 100%; min-width: 100%; max-width: 100%; border-right: none; border-bottom: 1px solid rgba(15,15,15,0.04); }
 }
 
-/* ================= DARK MODE OVERRIDES =================
-   These rules ensure text and UI are readable in dark mode.
-   They intentionally set high-contrast text (white) for all major elements.
-*/
+/* ================= DARK MODE OVERRIDES ================= */
 html.dark {
   --background-rgb: 18 18 20;     /* page background */
   --card-rgb: 24 24 27;           /* card surface */
@@ -257,9 +272,7 @@ html.dark .chip {
   color: rgb(var(--secondary-rgb));
 }
 
-/* icons using currentColor will adapt automatically (HiOutlineBell uses currentColor above) */
-
-/* small tweak for header avatar circle */
+/* tiny header avatar tweak */
 html.dark .header-avatar-fg {
   background: rgba(255,255,255,0.06);
   color: rgb(var(--accent-rgb));
@@ -273,13 +286,13 @@ html.dark .header-avatar-fg {
 /* keep desktop-only elements visible by default */
 .desktop-only { display: inline-flex; }
 
-/* show the mobile hamburger, mobile-only controls and hide desktop-only controls on small screens */
+/* show mobile controls and hide desktop-only on small screens */
 @media (max-width: 1000px) {
   .mobile-menu-btn { display: inline-flex !important; }   /* show hamburger */
   .mobile-only { display: inline-flex !important; }
   .desktop-only { display: none !important; }
 
-  /* hide the desktop sidebar on mobile (we show the sliding mobile panel) */
+  /* hide the desktop fixed sidebar on mobile (we show the sliding mobile panel) */
   .app-sidebar { display: none !important; }
 }
 
@@ -295,7 +308,6 @@ html.dark .header-avatar-fg {
   visibility: hidden;
 }
 
-/* when .open class added it becomes visible */
 .mobile-sidebar-overlay.open {
   display: block;
   opacity: 1;
@@ -320,56 +332,18 @@ html.dark .header-avatar-fg {
 .mobile-sidebar-panel.open {
   transform: translateX(0);
 }
-/* ===== transactions-table: improved mobile stacking (append to src/index.css) ===== */
 
-/* Mobile stacked table card layout for transactions-table */
-@media (max-width: 520px) {
-  /* hide header */
-  .transactions-table thead { display: none !important; }
+/* ================= small table + responsive helpers ================ */
+/* table responsive wrapper */
+.table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-  /* each row becomes a card */
-  .transactions-table tbody tr {
-    display: block;
-    margin-bottom: 12px;
-    border: 1px solid rgba(0,0,0,0.06);
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--card-rgb);
-  }
-
-  /* each cell becomes a horizontal line: label on left, value on right */
-  .transactions-table tbody td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 12px;
-    gap: 8px;
-    border-top: none;
-  }
-
-  .transactions-table tbody td[data-label]::before {
-    content: attr(data-label);
-    font-weight: 700;
-    margin-right: 8px;
-    color: rgba(var(--accent-rgb), 0.9);
-    white-space: nowrap;
-  }
-
-  /* Actions cell: keep buttons visible and wrap if needed */
-  .transactions-table tbody td[data-label="Actions"] {
-    justify-content: flex-end;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .transactions-table tbody td[data-label="Actions"] button {
-    white-space: nowrap;
-    padding: 6px;
-  }
-
-  /* ensure card background picks up dark mode properly */
-  html.dark .transactions-table tbody tr {
-    background: rgb(var(--card-rgb));
-    border-color: rgba(255,255,255,0.04);
-  }
+/* mobile stacked table (transactions) — keeps actions visible under fields */
+@media (max-width:520px){
+  .transactions-table thead { display:none; }
+  .transactions-table tbody tr { display:block; margin-bottom:12px; border:1px solid rgba(0,0,0,0.06); border-radius:8px; overflow:hidden; background:var(--card-rgb); }
+  .transactions-table tbody td { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-top:none; gap:8px; }
+  .transactions-table tbody td[data-label]::before { content:attr(data-label); font-weight:700; margin-right:8px; color:rgba(var(--accent-rgb),0.9); white-space:nowrap; }
+  .transactions-table tbody td[data-label="Actions"] { justify-content:flex-end; gap:8px; flex-wrap:wrap; }
+  .transactions-table tbody td[data-label="Actions"] button { white-space:nowrap; padding:6px 8px; }
+  html.dark .transactions-table tbody tr { background: rgb(var(--card-rgb)); border-color: rgba(255,255,255,0.04); }
 }

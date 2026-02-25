@@ -32,10 +32,10 @@ export default function Dashboard({ currentUser, onLogout, onLanding }: Props) {
   const [transactions, setTransactions] = useState<Transaction[]>(() => sampleTransactions.slice());
   const [view, setView] = useState<View>({ name: "home" });
 
-  // Sidebar open state for mobile
+  // sidebar state for mobile panel
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
-  // close sidebar on Escape
+  // close sidebar with Escape
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSidebarOpen(false); };
     window.addEventListener("keydown", onKey);
@@ -110,16 +110,19 @@ export default function Dashboard({ currentUser, onLogout, onLanding }: Props) {
 
   return (
     <div className="app-root" role="application">
-      {/* Sidebar: passes mobile open/close props */}
+      {/* Sidebar is fixed by CSS; pass mobile open/close props for overlay panel */}
       <Sidebar active={activeSidebarKey} onNavigate={handleNavigate} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
+      {/* Right content area: header (sticky) + main (scrollable) */}
       <div className="app-right">
         <header className="app-header">
           <Header currentUser={currentUser} onLogout={onLogout} onToggleSidebar={() => setSidebarOpen((s) => !s)} sidebarOpen={sidebarOpen} />
         </header>
 
         <main className="app-main">
-          <div style={{ width: "100%", maxWidth: 1200 }}>{renderMain()}</div>
+          <div style={{ width: "100%", maxWidth: 1200 }}>
+            {renderMain()}
+          </div>
         </main>
       </div>
     </div>
