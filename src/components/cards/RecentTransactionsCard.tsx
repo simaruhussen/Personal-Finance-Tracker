@@ -11,13 +11,21 @@ const sample = [
 export default function RecentTransactionsCard(): JSX.Element {
   return (
     <div className="card card-big" style={{ padding: 16 }}>
-      <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Recent Transactions</h3>
+      <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, marginBottom: 8, color: "rgb(var(--accent-rgb))" }}>Recent Transactions</h3>
       <div style={{ display: "grid", gap: 8 }}>
         {sample.map((t, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-            <div style={{ width: 80, color: "rgba(0,0,0,0.55)" }}>{t.date}</div>
-            <div style={{ flex: 1 }}>{t.category}</div>
-            <div style={{ width: 90, textAlign: "right", fontWeight: 700 }}>
+          <div
+            key={i}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+            }}
+          >
+            <div style={{ width: 80, color: "rgba(var(--accent-rgb), 0.7)" }}>{t.date}</div>
+            <div style={{ flex: 1, color: "rgb(var(--accent-rgb))" }}>{t.category}</div>
+            <div style={{ width: 90, textAlign: "right", fontWeight: 700, color: "rgb(var(--accent-rgb))" }}>
               {t.amt >= 0 ? `+$${t.amt}` : `-$${Math.abs(t.amt)}`}
             </div>
             <div style={{ marginLeft: 12 }}>

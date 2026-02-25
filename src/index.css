@@ -1,39 +1,129 @@
+/* ================= global palette + layout (keep your existing rules) =================
+   (This file contains both the base rules and the dark-mode overrides.)
+   Replace your current src/index.css with this file or merge the dark-block into your file.
+*/
+
+/* ---------- root color palette (essential subset) ---------- */
 :root{
-  --primary-rgb: 134 173 15;
-  --secondary-rgb: 223 203 93;
-  --accent-rgb: 64 63 62;
-  --background-rgb: 241 242 246;
+  --primary-rgb: 134 173 15;        /* #86ad0f */
+  --secondary-rgb: 223 203 93;     /* #dfcb5d */
+  --accent-rgb: 64 63 62;          /* #403f3e */
+  --background-rgb: 241 242 246;   /* #f1f2f6 */
   --card-rgb: 255 255 255;
+
   --sidebar-width: 260px;
   --header-height: 64px;
 }
 
-html,body,#root{height:100%;margin:0;padding:0;box-sizing:border-box}
-*,:before,:after{box-sizing:inherit}
-body{
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  background: rgb(var(--background-rgb));
-  color: rgb(var(--accent-rgb));
-  line-height:1.5;
+/* ---------- reset & base ---------- */
+html,body,#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* dashboard layout */
-.app-root{min-height:100%;display:flex;flex-direction:row;gap:0;background:rgb(var(--background-rgb))}
-.app-sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);max-width:var(--sidebar-width);background:rgb(var(--card-rgb));border-right:1px solid rgba(15,15,15,0.04);display:flex;flex-direction:column;padding:20px;box-sizing:border-box;overflow:auto}
-.app-right{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
-.app-header{height:var(--header-height);min-height:var(--header-height);display:flex;align-items:center;width:100%;padding:0 20px;background:rgb(var(--card-rgb));border-bottom:1px solid rgba(15,15,15,0.04);box-sizing:border-box;z-index:20}
-.app-main{flex:1 1 auto;overflow:auto;padding:24px;box-sizing:border-box}
+*, *::before, *::after { box-sizing: inherit; }
 
-/* cards + small utils */
-.card{background:rgb(var(--card-rgb));border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(9,10,12,0.04);border:1px solid rgba(15,15,15,0.03);box-sizing:border-box}
-.card--muted{background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(15,15,15,0.03)}
-.chip{display:inline-flex;align-items:center;justify-content:center;padding:0.25rem 0.5rem;border-radius:9999px;background:rgba(var(--secondary-rgb),0.08);color:rgb(var(--secondary-rgb));font-weight:600;font-size:0.75rem}
-.heading-lg{font-size:1.5rem;font-weight:800}
-:focus{outline:3px solid rgba(var(--primary-rgb),0.12);outline-offset:2px}
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: rgb(var(--background-rgb));
+  color: rgb(var(--accent-rgb));
+  line-height: 1.5;
+}
 
-/* Sign-in / Sign-up screens */
+/* ---------- layout containers ---------- */
+.app-root {
+  min-height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  background: rgb(var(--background-rgb));
+}
+
+.app-sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  background: rgb(var(--card-rgb));
+  border-right: 1px solid rgba(15,15,15,0.04);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: auto;
+  color: rgb(var(--accent-rgb));
+}
+
+.app-right {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.app-header {
+  height: var(--header-height);
+  min-height: var(--header-height);
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 20px;
+  background: rgb(var(--card-rgb));
+  border-bottom: 1px solid rgba(15,15,15,0.04);
+  box-sizing: border-box;
+  z-index: 20;
+}
+
+.app-main {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* ---------- small utilities ---------- */
+.card {
+  background: rgb(var(--card-rgb));
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(9,10,12,0.04);
+  border: 1px solid rgba(15,15,15,0.03);
+  box-sizing: border-box;
+  color: rgb(var(--accent-rgb));
+}
+
+.card--muted {
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(15,15,15,0.03);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(var(--secondary-rgb), 0.08);
+  color: rgb(var(--secondary-rgb));
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+/* headings */
+.heading-lg { font-size: 1.5rem; font-weight: 800; }
+
+/* focus outline for keyboard users */
+:focus { outline: 3px solid rgba(var(--primary-rgb), 0.12); outline-offset: 2px; }
+
+/* sign-in / sign-up styles (keep as-is if you already have them) */
 .auth-root{
   min-height:100vh;
   display:grid;
@@ -42,7 +132,7 @@ body{
   gap:24px;
   padding:40px;
   box-sizing:border-box;
-  background:linear-gradient(180deg, rgba(var(--background-rgb),1), rgba(var(--background-rgb),1));
+  background: linear-gradient(180deg, rgba(var(--background-rgb),1), rgba(var(--background-rgb),1));
 }
 
 .auth-left-bleed{
@@ -69,7 +159,7 @@ body{
   font-weight:800;
   margin:0 0 18px 0;
   letter-spacing:-0.02em;
-  color:rgb(var(--accent-rgb));
+  color: rgb(var(--accent-rgb));
   text-align:center;
 }
 
@@ -81,5 +171,96 @@ body{
 .auth-ghost{padding:12px 18px;border-radius:28px;border:1px solid rgba(var(--accent-rgb),0.06);background:transparent;cursor:pointer;color:rgb(var(--accent-rgb));font-weight:700}
 .auth-or{text-align:center;margin:6px 0;color:rgba(var(--accent-rgb),0.45);font-size:13px}
 .auth-illustration{justify-self:end;width:320px;max-width:36vw;display:flex;align-items:center;justify-content:center}
-@media (max-width:980px){.auth-root{grid-template-columns:1fr;padding:28px}.auth-left-bleed{display:none}.auth-illustration{display:none}.auth-card{width:100%;max-width:640px;margin:0 auto}}
-@media (max-width:880px){.app-root{flex-direction:column}.app-sidebar{width:100%;min-width:100%;max-width:100%;border-right:none;border-bottom:1px solid rgba(15,15,15,0.04)}.app-header{position:relative}}
+
+/* responsive */
+@media (max-width:980px){
+  .auth-root{grid-template-columns:1fr;padding:28px}
+  .auth-left-bleed{display:none}
+  .auth-illustration{display:none}
+  .auth-card{width:100%;max-width:640px;margin:0 auto}
+}
+@media (max-width:880px){
+  .app-root{flex-direction:column}
+  .app-sidebar{width:100%;min-width:100%;max-width:100%;border-right:none;border-bottom:1px solid rgba(15,15,15,0.04)}
+  .app-header{position:relative}
+}
+
+/* ================= DARK MODE OVERRIDES =================
+   These rules ensure text and UI are readable in dark mode.
+   They intentionally set high-contrast text (white) for all major elements.
+*/
+html.dark {
+  --background-rgb: 18 18 20;     /* page background */
+  --card-rgb: 24 24 27;           /* card surface */
+  --accent-rgb: 255 255 255;      /* primary text color -> white */
+  --primary-rgb: 104 138 12;      /* slightly darker green for dark mode */
+  --secondary-rgb: 210 190 80;    /* secondary accent */
+}
+
+/* body / root */
+html.dark body {
+  background: rgb(var(--background-rgb));
+  color: rgb(var(--accent-rgb));
+}
+
+/* ensure sidebar text is white in dark mode */
+html.dark .app-sidebar {
+  background: rgb(var(--card-rgb));
+  color: rgb(var(--accent-rgb));
+  border-right: 1px solid rgba(255,255,255,0.04);
+}
+
+/* cards */
+html.dark .card {
+  background: rgb(var(--card-rgb));
+  color: rgb(var(--accent-rgb));
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+
+/* headings and text */
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark p,
+html.dark div,
+html.dark span,
+html.dark button,
+html.dark label {
+  color: rgb(var(--accent-rgb));
+}
+
+/* inputs */
+html.dark .auth-input {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.06);
+  color: rgb(var(--accent-rgb));
+}
+
+/* buttons */
+html.dark .auth-btn {
+  background: rgb(var(--primary-rgb));
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+html.dark .auth-ghost {
+  border-color: rgba(255,255,255,0.06);
+  color: rgb(var(--accent-rgb));
+  background: transparent;
+}
+
+/* small UI pieces */
+html.dark .chip {
+  background: rgba(var(--secondary-rgb), 0.08);
+  color: rgb(var(--secondary-rgb));
+}
+
+/* icons using currentColor will adapt automatically (HiOutlineBell uses currentColor above) */
+
+/* small tweak for header avatar circle */
+html.dark .header-avatar-fg {
+  background: rgba(255,255,255,0.06);
+  color: rgb(var(--accent-rgb));
+}
