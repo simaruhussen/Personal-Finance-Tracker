@@ -12,7 +12,7 @@ export default function TransactionDetail({ tx, onBack }: Props) {
     <div>
       <button onClick={onBack} className="auth-ghost" style={{ marginBottom: 12 }}>Back</button>
 
-      <div className="card" style={{ padding: 18, maxWidth: 720 }}>
+      <div className="card" style={{ padding: 18, maxWidth: 920 }}>
         <h3 style={{ marginTop: 0, color: "rgb(var(--accent-rgb))" }}>Transaction Detail</h3>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

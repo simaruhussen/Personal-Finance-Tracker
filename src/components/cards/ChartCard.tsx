@@ -1,4 +1,4 @@
-import React, { type JSX } from "react";
+import React from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 const data = [
@@ -8,16 +8,11 @@ const data = [
   { category: "Investments", total: 1200 },
 ];
 
-const COLORS = [
-  "rgba(134,173,15,1)",
-  "rgba(223,203,93,1)",
-  "rgba(64,63,62,0.9)",
-  "rgba(105,125,20,1)",
-];
+const COLORS = ["rgba(134,173,15,1)", "rgba(223,203,93,1)", "rgba(64,63,62,0.9)", "rgba(105,125,20,1)"];
 
-export default function ChartCard(): JSX.Element {
+export default function ChartCard() {
   return (
-    <div className="card" style={{ padding: 16 }}>
+    <div className="card">
       <h4 style={{ margin: 0, fontWeight: 700, marginBottom: 10 }}>By Category</h4>
       <div style={{ width: "100%", height: 180 }}>
         <ResponsiveContainer>

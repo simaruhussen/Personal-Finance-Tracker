@@ -20,12 +20,11 @@ type FormValues = {
 export default function AddTransaction({ onSave, onCancel, initial }: Props) {
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: initial
-      ? { amount: Math.abs(initial.amount), type: initial.type, category: initial.category, date: initial.date.slice(0, 16), description: initial.description }
-      : { amount: 0, type: "expense", category: "", date: new Date().toISOString().slice(0, 16), description: "" },
+      ? { amount: Math.abs(initial.amount), type: initial.type, category: initial.category, date: initial.date.slice(0,16), description: initial.description }
+      : { amount: 0, type: "expense", category: "", date: new Date().toISOString().slice(0,16), description: "" },
   });
 
   const submit = (data: FormValues) => {
-    // ensure sign on amount for type
     const amt = data.type === "income" ? Math.abs(Number(data.amount)) : -Math.abs(Number(data.amount));
     onSave({ id: initial?.id, amount: amt, type: data.type, category: data.category, date: new Date(data.date).toISOString(), description: data.description });
   };
@@ -34,9 +33,9 @@ export default function AddTransaction({ onSave, onCancel, initial }: Props) {
     <div>
       <h2 style={{ fontSize: 22, marginBottom: 12, color: "rgb(var(--accent-rgb))" }}>{initial ? "Edit Transaction" : "Add Transaction"}</h2>
 
-      <div className="card" style={{ padding: 18, maxWidth: 720 }}>
+      <div className="card" style={{ padding: 18, maxWidth: 920 }}>
         <form onSubmit={handleSubmit(submit)} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <div style={{ gridColumn: "span 1" }}>
+          <div>
             <label style={{ display: "block", marginBottom: 6, color: "rgb(var(--accent-rgb))" }}>Amount</label>
             <input className="auth-input" {...register("amount", { valueAsNumber: true })} type="number" />
           </div>

@@ -1,16 +1,18 @@
 // src/components/Header.tsx
 import React, { useEffect, useState } from "react";
 import type { MockUser } from "../lib/auth";
-import { HiOutlineMoon, HiOutlineSun, HiOutlineBell } from "react-icons/hi";
+import { HiOutlineMoon, HiOutlineSun, HiOutlineBell, HiMenu } from "react-icons/hi";
 
 type Props = {
   currentUser: MockUser | null;
   onLogout: () => void;
+  onToggleSidebar?: () => void;
+  sidebarOpen?: boolean;
 };
 
-const THEME_KEY = "theme"; // 'light' | 'dark'
+const THEME_KEY = "theme";
 
-export default function Header({ currentUser, onLogout }: Props): JSX.Element {
+export default function Header({ currentUser, onLogout, onToggleSidebar, sidebarOpen }: Props) {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     try {
       const t = localStorage.getItem(THEME_KEY);
@@ -24,47 +26,52 @@ export default function Header({ currentUser, onLogout }: Props): JSX.Element {
     const root = document.documentElement;
     if (theme === "dark") root.classList.add("dark");
     else root.classList.remove("dark");
-    try {
-      localStorage.setItem(THEME_KEY, theme);
-    } catch {
-      /* ignore */
-    }
+    try { localStorage.setItem(THEME_KEY, theme); } catch {}
   }, [theme]);
 
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
-  // Icon color decisions:
-  // - In dark mode: show yellow sun (visible on dark bg)
-  // - In light mode: show moon with accent color
-  const sunColor = "#FFD43B"; // warm yellow for sun
-  const moonColor = "rgb(var(--accent-rgb))"; // uses accent variable (light/dark aware)
-
   return (
-    <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div
+    <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 12 }}>
+      {/* mobile-only hamburger (visible via CSS on small screens) */}
+      {onToggleSidebar && (
+        <button
+          className="mobile-menu-btn mobile-only"
+          aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+          aria-expanded={Boolean(sidebarOpen)}
+          onClick={onToggleSidebar}
           style={{
-            width: 36,
-            height: 36,
-            borderRadius: 8,
-            background: `rgb(var(--primary-rgb))`,
-            display: "flex",
+            display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "#fff",
-            fontWeight: 800,
+            width: 42,
+            height: 42,
+            borderRadius: 10,
+            border: "none",
+            background: "transparent",
+            cursor: "pointer",
           }}
         >
-          FT
+          <HiMenu size={22} />
+        </button>
+      )}
+
+      {/* We removed the left brand (FT + FinanceTracker) per request. */}
+
+      {/* fill space before right-side controls */}
+      <div style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
+        {/* desktop-only controls (username, notifications, settings) */}
+        <div className="desktop-only" style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          {currentUser && <div style={{ fontWeight: 700, color: "rgb(var(--accent-rgb))" }}>{currentUser.username}</div>}
+
+          <button aria-label="Notifications" title="Notifications" style={{ padding: 8, borderRadius: 8, border: "none", background: "transparent", cursor: "pointer" }}>
+            <HiOutlineBell size={18} />
+          </button>
+
+         
         </div>
-        <div style={{ fontSize: 18, fontWeight: 700 }}>FinanceTracker</div>
-      </div>
 
-      <div style={{ marginLeft: "auto", display: "flex", gap: 12, alignItems: "center" }}>
-        {/* username */}
-        {currentUser && <div style={{ fontWeight: 700 }}>{currentUser.username}</div>}
-
-        {/* theme toggle */}
+        {/* theme toggle (visible on all sizes) */}
         <button
           onClick={toggleTheme}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
@@ -81,29 +88,16 @@ export default function Header({ currentUser, onLogout }: Props): JSX.Element {
             cursor: "pointer",
           }}
         >
-          {theme === "dark" ? (
-            // show sun (yellow) while in dark mode
-            <HiOutlineSun size={20} color={sunColor} />
-          ) : (
-            // show moon in light mode (use accent color)
-            <HiOutlineMoon size={20} color={moonColor as unknown as string} />
-          )}
+          {theme === "dark" ? <HiOutlineSun size={18} color="#FFD43B" /> : <HiOutlineMoon size={18} color="rgb(var(--accent-rgb))" />}
         </button>
 
-        {/* notifications */}
-        <button
-          aria-label="Notifications"
-          title="Notifications"
-          style={{ padding: 8, borderRadius: 8, border: "none", background: "transparent", cursor: "pointer" }}
-        >
-          <HiOutlineBell size={18} color="currentColor" />
+        {/* mobile-only: logout visible on the header for small screens */}
+        <button onClick={onLogout} className="auth-ghost mobile-only" style={{ padding: "8px 12px", borderRadius: 8 }}>
+          Logout
         </button>
 
-        {/* settings */}
-        
-
-        {/* logout */}
-        <button onClick={onLogout} className="auth-ghost" style={{ padding: "8px 12px", borderRadius: 8 }}>
+        {/* desktop logout */}
+        <button onClick={onLogout} className="auth-ghost desktop-only" style={{ padding: "8px 12px", borderRadius: 8 }}>
           Logout
         </button>
       </div>

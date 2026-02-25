@@ -1,35 +1,22 @@
-import React, { type JSX } from "react";
+import React from "react";
 
 const sample = [
-  { date: "01/12/23", amt: 500, category: "Groceries", type: "income" },
-  { date: "02/12/23", amt: -200, category: "Utilities", type: "expense" },
-  { date: "03/12/23", amt: -150, category: "Salary", type: "income" },
-  { date: "04/12/23", amt: 1000, category: "Freelance", type: "income" },
-  { date: "05/12/23", amt: -300, category: "Rent", type: "expense" },
+  { date: "2025-06-01T08:00:00.000Z", amt: 500, category: "Groceries", type: "income" },
+  { date: "2025-06-02T10:30:00.000Z", amt: -50, category: "Groceries", type: "expense" },
 ];
 
-export default function RecentTransactionsCard(): JSX.Element {
+export default function RecentTransactionsCard() {
   return (
-    <div className="card card-big" style={{ padding: 16 }}>
+    <div className="card">
       <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, marginBottom: 8, color: "rgb(var(--accent-rgb))" }}>Recent Transactions</h3>
       <div style={{ display: "grid", gap: 8 }}>
         {sample.map((t, i) => (
-          <div
-            key={i}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 12,
-            }}
-          >
-            <div style={{ width: 80, color: "rgba(var(--accent-rgb), 0.7)" }}>{t.date}</div>
+          <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <div style={{ width: 90, color: "rgba(var(--accent-rgb), 0.7)" }}>{new Date(t.date).toLocaleDateString()}</div>
             <div style={{ flex: 1, color: "rgb(var(--accent-rgb))" }}>{t.category}</div>
-            <div style={{ width: 90, textAlign: "right", fontWeight: 700, color: "rgb(var(--accent-rgb))" }}>
-              {t.amt >= 0 ? `+$${t.amt}` : `-$${Math.abs(t.amt)}`}
-            </div>
+            <div style={{ width: 90, textAlign: "right", fontWeight: 700, color: "rgb(var(--accent-rgb))" }}>{t.amt >= 0 ? `+$${t.amt}` : `-$${Math.abs(t.amt)}`}</div>
             <div style={{ marginLeft: 12 }}>
-              <span className="chip">{t.type === "income" ? "Income" : "Expense"}</span>
+              <span className="chip" style={{ background: "rgba(var(--secondary-rgb),0.08)", color: "rgb(var(--secondary-rgb))" }}>{t.type}</span>
             </div>
           </div>
         ))}

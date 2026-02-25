@@ -264,3 +264,112 @@ html.dark .header-avatar-fg {
   background: rgba(255,255,255,0.06);
   color: rgb(var(--accent-rgb));
 }
+
+/* ========== MOBILE / VISIBILITY HELPERS & SIDEBAR OVERLAY ========== */
+
+/* hide mobile-only elements by default */
+.mobile-only { display: none !important; }
+
+/* keep desktop-only elements visible by default */
+.desktop-only { display: inline-flex; }
+
+/* show the mobile hamburger, mobile-only controls and hide desktop-only controls on small screens */
+@media (max-width: 1000px) {
+  .mobile-menu-btn { display: inline-flex !important; }   /* show hamburger */
+  .mobile-only { display: inline-flex !important; }
+  .desktop-only { display: none !important; }
+
+  /* hide the desktop sidebar on mobile (we show the sliding mobile panel) */
+  .app-sidebar { display: none !important; }
+}
+
+/* Mobile sidebar overlay & panel (slide-in) */
+.mobile-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0,0,0,0.35);
+  transition: opacity .18s ease, visibility .18s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* when .open class added it becomes visible */
+.mobile-sidebar-overlay.open {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-sidebar-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 85%;
+  background: rgb(var(--card-rgb));
+  box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+  transform: translateX(-12%);
+  transition: transform .2s ease;
+  padding: 20px;
+  overflow: auto;
+}
+
+.mobile-sidebar-panel.open {
+  transform: translateX(0);
+}
+/* ===== transactions-table: improved mobile stacking (append to src/index.css) ===== */
+
+/* Mobile stacked table card layout for transactions-table */
+@media (max-width: 520px) {
+  /* hide header */
+  .transactions-table thead { display: none !important; }
+
+  /* each row becomes a card */
+  .transactions-table tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--card-rgb);
+  }
+
+  /* each cell becomes a horizontal line: label on left, value on right */
+  .transactions-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    gap: 8px;
+    border-top: none;
+  }
+
+  .transactions-table tbody td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 700;
+    margin-right: 8px;
+    color: rgba(var(--accent-rgb), 0.9);
+    white-space: nowrap;
+  }
+
+  /* Actions cell: keep buttons visible and wrap if needed */
+  .transactions-table tbody td[data-label="Actions"] {
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .transactions-table tbody td[data-label="Actions"] button {
+    white-space: nowrap;
+    padding: 6px;
+  }
+
+  /* ensure card background picks up dark mode properly */
+  html.dark .transactions-table tbody tr {
+    background: rgb(var(--card-rgb));
+    border-color: rgba(255,255,255,0.04);
+  }
+}
