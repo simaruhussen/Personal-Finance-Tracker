@@ -1,32 +1,62 @@
-import express from "express";
-import helmet from "helmet";
-import cors from "cors";
-import morgan from "morgan";
-import { logger } from "./shared/utils/logger";
-import userRoutes from "./modules/users/user.routes";
-import transactionRoutes from "./modules/transactions/transaction.routes";
-import { errorMiddleware } from "./shared/middlewares/error.middleware";
-import { apiRateLimiter } from "./shared/middlewares/rateLimiter.middleware";
-import { metricsRouter } from "./telemetry/metrics";
+// app.ts
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+
+// Swagger
+import { setupSwagger } from './swagger.js';
+
+// Correct relative imports for TS/Node ESM
+import { errorHandler } from './middlewares/errorHandler.js';
+import { register, login } from './controllers/authController.js';
+import { createTransaction, getTransactions, getSummary } from './controllers/transactionController.js';
+import { authenticate } from './middlewares/auth.js';
 
 const app = express();
 
+// -------------------------
+// Security & Middlewares
+// -------------------------
 app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN ?? "*" }));
-app.use(express.json({ limit: "10kb" }));
-app.use(apiRateLimiter);
+app.use(cors());
+app.use(express.json());
+app.use(morgan('dev'));
 
-if (process.env.NODE_ENV !== "test") {
-  app.use(morgan("combined", { stream: { write: (s) => logger.info(s.trim()) } }));
-}
+// Rate Limiting
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+app.use(limiter);
 
-app.get("/health", (_req, res) => res.json({ status: "ok" }));
-app.use("/metrics", metricsRouter);
+// -------------------------
+// Health Check Route
+// -------------------------
+app.get('/', (req, res) => {
+  res.send('Personal Finance Tracker API is running 🚀');
+});
 
-app.use("/api/users", userRoutes);
-app.use("/api/transactions", transactionRoutes);
+// -------------------------
+// Swagger Setup
+// -------------------------
+setupSwagger(app);
 
-// last: error handler
-app.use(errorMiddleware);
+// -------------------------
+// Auth Routes
+// -------------------------
+app.post('/api/auth/register', register);
+app.post('/api/auth/login', login);
+
+// -------------------------
+// Protected Transaction Routes
+// -------------------------
+app.use('/api/transactions', authenticate);
+app.post('/api/transactions', createTransaction);
+app.get('/api/transactions', getTransactions);
+app.get('/api/summary', authenticate, getSummary);
+
+// -------------------------
+// Error Handling
+// -------------------------
+app.use(errorHandler);
 
 export default app;

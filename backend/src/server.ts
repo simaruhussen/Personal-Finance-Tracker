@@ -1,32 +1,10 @@
-import app from "./app";
-import { config } from "./config";
-import { logger } from "./shared/utils/logger";
-import prisma from "./db/prismaClient";
+import "dotenv/config";
 
-const port = Number(process.env.PORT ?? 4000);
+import app from "./app.js";
+import { logger } from "./utils/logger.js";
 
-const server = app.listen(port, async () => {
-  logger.info(`Server listening on port ${port}`);
-  try {
-    await prisma.$connect();
-    logger.info("Database connected");
-  } catch (err) {
-    logger.error({ err }, "database_connection_failed");
-    process.exit(1);
-  }
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  logger.info(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
 });
-
-const graceful = async () => {
-  logger.info("Shutting down gracefully");
-  server.close(async () => {
-    try {
-      await prisma.$disconnect();
-      logger.info("Database disconnected");
-    } finally {
-      process.exit(0);
-    }
-  });
-};
-
-process.on("SIGINT", graceful);
-process.on("SIGTERM", graceful);
