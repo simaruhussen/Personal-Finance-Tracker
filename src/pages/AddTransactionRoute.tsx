@@ -4,7 +4,7 @@ import AddTransaction from "./AddTransaction";
 import type { DashboardOutletContext } from "./Dashboard";
 import type { Transaction } from "../lib/types";
 import { useTransactionsQuery } from "../features/transactions/queries";
-import { useCreateTransactionMutation, mutationErrorToMessage } from "../features/transactions/mutations";
+import { useCreateTransactionMutation, useUpdateTransactionMutation, mutationErrorToMessage } from "../features/transactions/mutations";
 
 type LocationState = {
   editId?: string;
@@ -14,6 +14,7 @@ export default function AddTransactionRoute() {
   const { currentUser } = useOutletContext<DashboardOutletContext>();
   const { data: transactions = [] } = useTransactionsQuery();
   const createMutation = useCreateTransactionMutation();
+  const updateMutation = useUpdateTransactionMutation();
   const navigate = useNavigate();
   const location = useLocation();
   const state = (location.state ?? null) as LocationState;
@@ -25,13 +26,21 @@ export default function AddTransactionRoute() {
   }, [state?.editId, transactions]);
 
   const handleSave = (payload: Omit<Transaction, "id"> & { id?: string }) => {
-    // For now, only create is persisted; edits are not supported by the API.
-    createMutation
-      .mutateAsync(payload)
-      .then(() => navigate("/transactions"))
-      .catch(() => {
-        // errors are surfaced via mutationErrorToMessage below
-      });
+    if (payload.id) {
+      updateMutation
+        .mutateAsync({ id: payload.id, input: payload })
+        .then(() => navigate("/transactions"))
+        .catch(() => {
+          /* errors surfaced via mutationErrorToMessage */
+        });
+    } else {
+      createMutation
+        .mutateAsync(payload)
+        .then(() => navigate("/transactions"))
+        .catch(() => {
+          /* errors surfaced via mutationErrorToMessage */
+        });
+    }
   };
 
   if (!currentUser) return null;

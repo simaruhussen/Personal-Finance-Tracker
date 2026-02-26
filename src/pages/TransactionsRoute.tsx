@@ -1,26 +1,35 @@
-import React, { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import TransactionsList from "./TransactionsList";
 import type { DashboardOutletContext } from "./Dashboard";
 import type { Transaction } from "../lib/types";
-import { useTransactionsQuery, TRANSACTIONS_KEY, queryErrorToMessage } from "../features/transactions/queries";
+import { useTransactionsQuery, queryErrorToMessage } from "../features/transactions/queries";
+import { useDeleteTransactionMutation } from "../features/transactions/mutations";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 export default function TransactionsRoute() {
   const { currentUser } = useOutletContext<DashboardOutletContext>();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { data, isLoading, isError, error, refetch } = useTransactionsQuery();
+  const deleteMutation = useDeleteTransactionMutation();
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
-  const handleDelete = useCallback(
-    (id: string) => {
-      if (!confirm("Delete this transaction?")) return;
-      queryClient.setQueryData<Transaction[] | undefined>(TRANSACTIONS_KEY, (prev) =>
-        prev ? prev.filter((t) => t.id !== id) : prev,
-      );
-    },
-    [queryClient]
-  );
+  const openDeleteDialog = useCallback((id: string) => {
+    setPendingDeleteId(id);
+  }, []);
+
+  const closeDeleteDialog = useCallback(() => {
+    setPendingDeleteId(null);
+  }, []);
+
+  const confirmDelete = useCallback(() => {
+    if (!pendingDeleteId) return;
+    deleteMutation.mutate(pendingDeleteId, {
+      onSettled: () => {
+        setPendingDeleteId(null);
+      },
+    });
+  }, [deleteMutation, pendingDeleteId]);
 
   const handleEdit = useCallback(
     (tx: Transaction) => {
@@ -60,12 +69,24 @@ export default function TransactionsRoute() {
   const transactions = data ?? [];
 
   return (
-    <TransactionsList
-      transactions={transactions}
-      onDetail={handleDetail}
-      onEdit={handleEdit}
-      onDelete={handleDelete}
-    />
+    <>
+      <TransactionsList
+        transactions={transactions}
+        onDetail={handleDetail}
+        onEdit={handleEdit}
+        onDelete={openDeleteDialog}
+      />
+
+      <ConfirmDialog
+        open={!!pendingDeleteId}
+        title="Delete transaction"
+        message="Are you sure you want to delete this transaction?"
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={closeDeleteDialog}
+      />
+    </>
   );
 }
 

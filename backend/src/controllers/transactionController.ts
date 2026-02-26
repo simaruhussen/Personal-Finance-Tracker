@@ -95,9 +95,11 @@ export const getSummary = async (req: Request, res: Response, next: NextFunction
  */
 export const updateTransaction = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const idParam = req.params.id;
-    const id = Number(idParam);
-    if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid transaction id' });
+    // Accept id from URL param or request body (some clients may send id in body)
+    const id = (req.params && req.params.id) || (req.body && req.body.id);
+    // eslint-disable-next-line no-console
+    console.log('updateTransaction: resolved id=', id);
+    if (!id || typeof id !== 'string') return res.status(400).json({ message: 'Invalid transaction id' });
 
     const userId = (req as any).user.userId;
 
@@ -149,9 +151,12 @@ export const updateTransaction = async (req: Request, res: Response, next: NextF
  */
 export const deleteTransaction = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const idParam = req.params.id;
-    const id = Number(idParam);
-    if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid transaction id' });
+    // Accept id from URL param or request body (some clients may send id in body)
+    const id = (req.params && req.params.id) || (req.body && req.body.id);
+    // debug: log incoming id and request info to help diagnose invalid id issues
+    // eslint-disable-next-line no-console
+    console.log('deleteTransaction called:', { method: req.method, url: req.url, resolvedId: id, params: req.params, headersAuth: req.headers.authorization ? 'present' : 'missing' });
+    if (!id || typeof id !== 'string') return res.status(400).json({ message: 'Invalid transaction id' });
 
     const userId = (req as any).user.userId;
 
