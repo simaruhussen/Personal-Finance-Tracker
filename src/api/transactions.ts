@@ -31,3 +31,12 @@ export async function createTransaction(payload: CreateTransactionRequest): Prom
   return res.data;
 }
 
+export async function deleteTransaction(id: string): Promise<void> {
+  await http.delete(`/api/transactions/${encodeURIComponent(id)}`);
+}
+
+export async function updateTransaction(id: string, payload: CreateTransactionRequest): Promise<ApiTransaction> {
+  const res = await http.put<ApiTransaction>(`/api/transactions/${encodeURIComponent(id)}`, payload);
+  return res.data;
+}
+
