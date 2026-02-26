@@ -1,6 +1,7 @@
-import React, { useMemo, type JSX } from "react";
+import React, { useMemo, useState, type JSX } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import { mutationErrorToMessage, useLoginMutation } from "../features/auth/mutations";
 
 type FormValues = {
@@ -15,6 +16,8 @@ export default function SignIn(): JSX.Element {
   const loginMutation = useLoginMutation();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const from = useMemo(() => {
     const state = location.state as { from?: unknown } | null;
@@ -78,18 +81,57 @@ export default function SignIn(): JSX.Element {
 
           <div style={{ width: "100%", marginTop: 6 }}>
             <label className="auth-label" htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              className="auth-input"
-              {...register("password", { required: "Password is required" })}
-              placeholder="••••••••"
-              style={{ width: "100%", color: "rgb(var(--accent-rgb))" }}
-            />
-            {formState.errors.password && <div style={{ color: "#b91c1c", fontSize: 13 }}>{String(formState.errors.password.message)}</div>}
+
+            <div style={{ position: "relative", width: "100%" }}>
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                className="auth-input"
+                {...register("password", { required: "Password is required" })}
+                placeholder="••••••••"
+                style={{
+                  width: "100%",
+                  color: "rgb(var(--accent-rgb))",
+                  paddingRight: 44, // space for the eye button
+                }}
+                aria-describedby={formState.errors.password ? "password-error" : undefined}
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                className="auth-ghost"
+                style={{
+                  position: "absolute",
+                  right: 8,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  height: 32,
+                  width: 32,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 8,
+                  padding: 4,
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "rgb(var(--accent-rgb))",
+                }}
+              >
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+              </button>
+            </div>
+
+            {formState.errors.password && (
+              <div id="password-error" style={{ color: "#b91c1c", fontSize: 13 }}>
+                {String(formState.errors.password.message)}
+              </div>
+            )}
           </div>
 
-          {/* Forgot? above the button */}
           <div style={{ width: "100%", display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
             <button
               type="button"
@@ -101,7 +143,6 @@ export default function SignIn(): JSX.Element {
             </button>
           </div>
 
-          {/* Sign in button */}
           <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: 8 }}>
             <button
               type="submit"
@@ -119,7 +160,6 @@ export default function SignIn(): JSX.Element {
             </div>
           )}
 
-          {/* bottom-right single inline unit using CSS variable based color */}
           <div style={{ width: "100%", marginTop: 16, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8 }}>
             <div style={{ color: "rgba(var(--accent-rgb),0.85)", fontSize: 14, marginRight: 6 }}>Don't have an account?</div>
             <button
