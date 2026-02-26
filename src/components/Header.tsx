@@ -1,10 +1,10 @@
 // src/components/Header.tsx
 import React, { useEffect, useState } from "react";
-import type { MockUser } from "../lib/auth";
+import type { User } from "../features/auth/types";
 import { HiOutlineMoon, HiOutlineSun, HiOutlineBell, HiMenu } from "react-icons/hi";
 
 type Props = {
-  currentUser: MockUser | null;
+  currentUser: User | null;
   onLogout: () => void;
   onToggleSidebar?: () => void;
   sidebarOpen?: boolean;
@@ -60,9 +60,13 @@ export default function Header({ currentUser, onLogout, onToggleSidebar, sidebar
 
       {/* fill space before right-side controls */}
       <div style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
-        {/* desktop-only controls (username, notifications, settings) */}
+        {/* desktop-only controls (user, notifications, settings) */}
         <div className="desktop-only" style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          {currentUser && <div style={{ fontWeight: 700, color: "rgb(var(--accent-rgb))" }}>{currentUser.username}</div>}
+          {currentUser && (
+            <div style={{ fontWeight: 700, color: "rgb(var(--accent-rgb))" }}>
+              {currentUser.fullName || currentUser.email}
+            </div>
+          )}
 
           <button aria-label="Notifications" title="Notifications" style={{ padding: 8, borderRadius: 8, border: "none", background: "transparent", cursor: "pointer" }}>
             <HiOutlineBell size={18} />

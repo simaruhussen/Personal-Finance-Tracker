@@ -26,7 +26,14 @@ export default function AddTransaction({ onSave, onCancel, initial }: Props) {
 
   const submit = (data: FormValues) => {
     const amt = data.type === "income" ? Math.abs(Number(data.amount)) : -Math.abs(Number(data.amount));
-    onSave({ id: initial?.id, amount: amt, type: data.type, category: data.category, date: new Date(data.date).toISOString(), description: data.description });
+    onSave({
+      id: initial?.id,
+      amount: amt,
+      type: data.type,
+      category: data.category,
+      date: new Date(data.date).toISOString(),
+      description: data.description,
+    });
   };
 
   return (

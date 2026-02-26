@@ -1,33 +1,29 @@
-import React, { useState, type JSX } from "react";
+import React, { useMemo, type JSX } from "react";
 import { useForm } from "react-hook-form";
-import { findUserByCredentials, setCurrentUser } from "../lib/auth";
-import type { MockUser } from "../lib/auth";
-
-type Props = {
-  onSignedIn: (user: MockUser) => void;
-  onGoToSignup: () => void;
-};
+import { useLocation, useNavigate } from "react-router-dom";
+import { mutationErrorToMessage, useLoginMutation } from "../features/auth/mutations";
 
 type FormValues = {
   email: string;
   password: string;
 };
 
-export default function SignIn({ onSignedIn, onGoToSignup }: Props): JSX.Element {
+export default function SignIn(): JSX.Element {
   const { register, handleSubmit, formState } = useForm<FormValues>({
     defaultValues: { email: "", password: "" },
   });
-  const [error, setError] = useState<string | null>(null);
+  const loginMutation = useLoginMutation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const onSubmit = (data: FormValues) => {
-    setError(null);
-    const user = findUserByCredentials(data.email, data.password);
-    if (!user) {
-      setError("Invalid credentials. If you don't have an account click Get started.");
-      return;
-    }
-    setCurrentUser(user);
-    onSignedIn(user);
+  const from = useMemo(() => {
+    const state = location.state as { from?: unknown } | null;
+    return typeof state?.from === "string" ? state.from : "/";
+  }, [location.state]);
+
+  const onSubmit = async (data: FormValues) => {
+    await loginMutation.mutateAsync({ email: data.email, password: data.password });
+    navigate(from, { replace: true });
   };
 
   return (
@@ -67,12 +63,17 @@ export default function SignIn({ onSignedIn, onGoToSignup }: Props): JSX.Element
             <label className="auth-label" htmlFor="email">Email</label>
             <input
               id="email"
+              type="email"
               className="auth-input"
               {...register("email", { required: "Email is required" })}
               placeholder="you@example.com"
               style={{ width: "100%", color: "rgb(var(--accent-rgb))" }}
             />
-            {formState.errors.email && <div style={{ color: "#b91c1c", fontSize: 13 }}>{String(formState.errors.email.message)}</div>}
+            {formState.errors.email && (
+              <div style={{ color: "#b91c1c", fontSize: 13 }}>
+                {String(formState.errors.email.message)}
+              </div>
+            )}
           </div>
 
           <div style={{ width: "100%", marginTop: 6 }}>
@@ -106,12 +107,17 @@ export default function SignIn({ onSignedIn, onGoToSignup }: Props): JSX.Element
               type="submit"
               className="auth-btn"
               style={{ width: 360, maxWidth: "100%", display: "inline-flex", justifyContent: "center" }}
+              disabled={loginMutation.isPending}
             >
-              Sign in
+              {loginMutation.isPending ? "Signing in…" : "Sign in"}
             </button>
           </div>
 
-          {error && <div style={{ color: "#b91c1c", fontSize: 13, width: "100%", textAlign: "center", marginTop: 10 }}>{error}</div>}
+          {loginMutation.error && (
+            <div style={{ color: "#b91c1c", fontSize: 13, width: "100%", textAlign: "center", marginTop: 10 }}>
+              {mutationErrorToMessage(loginMutation.error)}
+            </div>
+          )}
 
           {/* bottom-right single inline unit using CSS variable based color */}
           <div style={{ width: "100%", marginTop: 16, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8 }}>
@@ -119,7 +125,7 @@ export default function SignIn({ onSignedIn, onGoToSignup }: Props): JSX.Element
             <button
               type="button"
               className="auth-ghost"
-              onClick={onGoToSignup}
+              onClick={() => navigate("/register")}
               style={{ padding: "10px 16px", borderRadius: 20, color: "rgb(var(--accent-rgb))" }}
             >
               Get started

@@ -1,30 +1,31 @@
 import React, { useState, type JSX } from "react";
 import { useForm } from "react-hook-form";
-import { createUser, findUserByEmail, setCurrentUser } from "../lib/auth";
-import type { MockUser } from "../lib/auth";
-
-type Props = {
-  onSignedUp: (user: MockUser) => void;
-  onBack: () => void;
-};
+import { useNavigate } from "react-router-dom";
+import { mutationErrorToMessage, useRegisterMutation } from "../features/auth/mutations";
 
 type FormValues = {
-  username: string;
+  fullName: string;
   email: string;
   password: string;
   confirmPassword: string;
 };
 
-export default function SignUp({ onSignedUp, onBack }: Props): JSX.Element {
+export default function SignUp(): JSX.Element {
   const { register, handleSubmit, watch, formState } = useForm<FormValues>({
-    defaultValues: { username: "", email: "", password: "", confirmPassword: "" },
+    defaultValues: { fullName: "", email: "", password: "", confirmPassword: "" },
   });
   const [error, setError] = useState<string | null>(null);
+  const registerMutation = useRegisterMutation();
+  const navigate = useNavigate();
 
   const password = watch("password");
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     setError(null);
+    if (!data.fullName) {
+      setError("Full name is required.");
+      return;
+    }
     if (!data.email) {
       setError("Email is required.");
       return;
@@ -37,13 +38,16 @@ export default function SignUp({ onSignedUp, onBack }: Props): JSX.Element {
       setError("Passwords do not match.");
       return;
     }
-    if (findUserByEmail(data.email)) {
-      setError("An account with this email already exists. Please sign in.");
-      return;
+    try {
+      await registerMutation.mutateAsync({
+        fullName: data.fullName,
+        email: data.email,
+        password: data.password,
+      });
+      navigate("/", { replace: true });
+    } catch (err) {
+      setError(mutationErrorToMessage(err));
     }
-    const user = createUser({ username: data.username || data.email, email: data.email, password: data.password });
-    setCurrentUser(user);
-    onSignedUp(user);
   };
 
   return (
@@ -72,14 +76,32 @@ export default function SignUp({ onSignedUp, onBack }: Props): JSX.Element {
           style={{ width: "100%", maxWidth: 420, display: "flex", flexDirection: "column", alignItems: "center", margin: "0 auto", color: "rgb(var(--accent-rgb))" }}
         >
           <div style={{ width: "100%" }}>
-            <label className="auth-label" htmlFor="username">Full name</label>
-            <input id="username" className="auth-input" {...register("username")} placeholder="Your name" style={{ color: "rgb(var(--accent-rgb))" }} />
+            <label className="auth-label" htmlFor="fullName">Full name</label>
+            <input
+              id="fullName"
+              className="auth-input"
+              {...register("fullName", { required: true })}
+              placeholder="Your name"
+              style={{ color: "rgb(var(--accent-rgb))" }}
+            />
+            {formState.errors.fullName && (
+              <div style={{ color: "#b91c1c", fontSize: 13 }}>Full name is required</div>
+            )}
           </div>
 
           <div style={{ width: "100%" }}>
             <label className="auth-label" htmlFor="email">Email</label>
-            <input id="email" className="auth-input" {...register("email", { required: true })} placeholder="you@example.com" style={{ color: "rgb(var(--accent-rgb))" }} />
-            {formState.errors.email && <div style={{ color: "#b91c1c", fontSize: 13 }}>Email is required</div>}
+            <input
+              id="email"
+              type="email"
+              className="auth-input"
+              {...register("email", { required: true })}
+              placeholder="you@example.com"
+              style={{ color: "rgb(var(--accent-rgb))" }}
+            />
+            {formState.errors.email && (
+              <div style={{ color: "#b91c1c", fontSize: 13 }}>Email is required</div>
+            )}
           </div>
 
           <div style={{ width: "100%" }}>
@@ -93,17 +115,31 @@ export default function SignUp({ onSignedUp, onBack }: Props): JSX.Element {
             <input id="confirmPassword" type="password" className="auth-input" {...register("confirmPassword", { required: true })} placeholder="Repeat password" style={{ color: "rgb(var(--accent-rgb))" }} />
           </div>
 
-          {error && <div style={{ color: "#b91c1c", fontSize: 13, width: "100%", textAlign: "center", marginTop: 8 }}>{error}</div>}
+          {(error || registerMutation.error) && (
+            <div style={{ color: "#b91c1c", fontSize: 13, width: "100%", textAlign: "center", marginTop: 8 }}>
+              {error ?? mutationErrorToMessage(registerMutation.error)}
+            </div>
+          )}
 
           <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: 10 }}>
-            <button type="submit" className="auth-btn" style={{ width: 360, maxWidth: "100%", display: "inline-flex", justifyContent: "center" }}>
-              Sign up
+            <button
+              type="submit"
+              className="auth-btn"
+              style={{ width: 360, maxWidth: "100%", display: "inline-flex", justifyContent: "center" }}
+              disabled={registerMutation.isPending}
+            >
+              {registerMutation.isPending ? "Creating account…" : "Sign up"}
             </button>
           </div>
 
           <div style={{ width: "100%", marginTop: 16, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8 }}>
             <div style={{ color: "rgba(var(--accent-rgb),0.85)", fontSize: 14, marginRight: 6 }}>Already have an account?</div>
-            <button type="button" className="auth-ghost" onClick={onBack} style={{ padding: "10px 16px", borderRadius: 20, color: "rgb(var(--accent-rgb))" }}>
+            <button
+              type="button"
+              className="auth-ghost"
+              onClick={() => navigate("/login")}
+              style={{ padding: "10px 16px", borderRadius: 20, color: "rgb(var(--accent-rgb))" }}
+            >
               Sign in
             </button>
           </div>

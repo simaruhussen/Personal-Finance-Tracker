@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import prisma from "../lib/prisma.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { registerSchema } from "../utils/validators.js";
+import { registerSchema, loginSchema } from "../utils/validators.js";
 
 /**
  * @swagger
@@ -24,35 +24,39 @@ import { registerSchema } from "../utils/validators.js";
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - fullName
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               fullName:
  *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
  *     responses:
  *       201:
  *         description: User created successfully
  *       400:
- *         description: Username already taken
+ *         description: Email already taken
  */
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { username, password } = registerSchema.parse(req.body);
+    const { fullName, email, password } = registerSchema.parse(req.body);
 
     const existingUser = await prisma.user.findUnique({
-      where: { username },
+      where: { email },
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: "Username taken" });
+      return res.status(400).json({ message: "Email already registered" });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
-      data: { username, passwordHash },
+      data: { fullName, email, passwordHash },
     });
 
     res.status(201).json({ message: "User created", userId: user.id });
@@ -74,11 +78,12 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
  *     responses:
@@ -89,10 +94,10 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
  */
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = loginSchema.parse(req.body);
 
     const user = await prisma.user.findUnique({
-      where: { username },
+      where: { email },
     });
 
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
@@ -107,7 +112,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     res.json({
       token,
-      user: { id: user.id, username: user.username },
+      user: { id: user.id, fullName: user.fullName, email: user.email },
     });
   } catch (error) {
     next(error);

@@ -1,37 +1,30 @@
-import React, { useEffect, useState, type JSX } from "react";
+import React, { type JSX } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import { getCurrentUser } from "./lib/auth";
-import type { MockUser } from "./lib/auth";
-
-type Route = "signin" | "signup" | "dashboard";
+import DashboardHome from "./pages/DashboardHome";
+import TransactionsRoute from "./pages/TransactionsRoute";
+import AddTransactionRoute from "./pages/AddTransactionRoute";
+import TransactionDetailRoute from "./pages/TransactionDetailRoute";
+import ProtectedRoute from "./features/auth/ProtectedRoute";
 
 export default function App(): JSX.Element {
-  const [route, setRoute] = useState<Route>(() => (getCurrentUser() ? "dashboard" : "signin"));
-  const [user, setUser] = useState<MockUser | null>(() => getCurrentUser());
+  return (
+    <Routes>
+      <Route path="/login" element={<SignIn />} />
+      <Route path="/register" element={<SignUp />} />
 
-  useEffect(() => {
-    if (user) setRoute("dashboard");
-  }, [user]);
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<Dashboard />}>
+          <Route index element={<DashboardHome />} />
+          <Route path="transactions" element={<TransactionsRoute />} />
+          <Route path="transactions/new" element={<AddTransactionRoute />} />
+          <Route path="transactions/:id" element={<TransactionDetailRoute />} />
+        </Route>
+      </Route>
 
-  const handleSignedIn = (u: MockUser) => {
-    setUser(u);
-    setRoute("dashboard");
-  };
-
-  const handleSignOut = () => {
-    setUser(null);
-    setRoute("signin");
-  };
-
-  if (route === "signin") {
-    return <SignIn onSignedIn={handleSignedIn} onGoToSignup={() => setRoute("signup")} />;
-  }
-
-  if (route === "signup") {
-    return <SignUp onSignedUp={handleSignedIn} onBack={() => setRoute("signin")} />;
-  }
-
-  return <Dashboard currentUser={user} onLogout={handleSignOut} onLanding={() => setRoute("signin")} />;
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }

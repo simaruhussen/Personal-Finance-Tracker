@@ -1,8 +1,7 @@
-// src/components/Sidebar.tsx
 import React, { useEffect, useState } from "react";
 import { HiOutlineHome, HiOutlineClock, HiOutlineChartBar } from "react-icons/hi";
 import { FaExchangeAlt, FaMoneyBillWave, FaCog } from "react-icons/fa";
-import logo from "../assets/logoforpft.png";
+import logo from "../assets/logoforft.png";
 
 type Props = {
   active: string;
@@ -22,7 +21,6 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // ensure submenu opens when active view is under transactions
   useEffect(() => {
     if (active.startsWith("transactions")) setTxOpen(true);
   }, [active]);
@@ -45,22 +43,26 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
     textAlign: "left",
   });
 
-  // Desktop sidebar
   const desktopSidebar = (
     <aside className="app-sidebar desktop-only" aria-hidden={isSmall}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-        {/* Imported image badge (keeps same size & rounded corners as before) */}
-        <img
-          src={logo}
-          alt="logo"
+        <div
           style={{
-            width: 60,
-            height: 60,
-            borderRadius: 8,
-            objectFit: "cover",
-            display: "block",
+            width: 65,
+            height: 65,
+            borderRadius: 10,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(var(--primary-rgb),0.1)",
+            fontWeight: 800,
+            color: "rgb(var(--accent-rgb))",
+            overflow: "hidden",
           }}
-        />
+          aria-label="Finance Tracker"
+        >
+          <img src={logo} alt="FinanceTracker logo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        </div>
 
         <div style={{ fontWeight: 700, color: "rgb(var(--accent-rgb))" }}>FinanceTracker</div>
       </div>
@@ -70,13 +72,12 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
           <HiOutlineHome /> Home
         </button>
 
-        {/* Transactions top-level */}
         <div>
           <button
             style={navBtnStyle(active.startsWith("transactions"))}
             onClick={() => {
               setTxOpen((s) => !s);
-              onNavigate("transactions.list"); // open submenu and navigate to list
+              onNavigate("transactions.list");
             }}
             aria-expanded={txOpen}
           >
@@ -85,7 +86,6 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
             <div style={{ marginLeft: "auto", opacity: 0.75 }}>{txOpen ? "▾" : "▸"}</div>
           </button>
 
-          {/* Submenu */}
           {txOpen && (
             <div style={{ marginTop: 8, marginLeft: 8, display: "flex", flexDirection: "column", gap: 6 }}>
               <button
@@ -129,7 +129,6 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
     </aside>
   );
 
-  // Mobile overlay & panel (uses same logo but slightly smaller)
   const mobileOverlayOpen = Boolean(isOpen);
   return (
     <>
@@ -144,17 +143,22 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between", marginBottom: 18 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <img
-                src={logo}
-                alt="logo"
+              <div
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 32,
+                  height: 32,
                   borderRadius: 8,
-                  objectFit: "cover",
-                  display: "block",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "rgba(var(--primary-rgb),0.1)",
+                  fontWeight: 800,
+                  color: "rgb(var(--accent-rgb))",
+                  overflow: "hidden",
                 }}
-              />
+              >
+                <img src={logo} alt="FinanceTracker logo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              </div>
               <div style={{ fontWeight: 700, color: "rgb(var(--accent-rgb))" }}>FinanceTracker</div>
             </div>
 
