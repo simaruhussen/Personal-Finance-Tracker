@@ -1,7 +1,8 @@
 // src/components/Sidebar.tsx
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { HiOutlineHome, HiOutlineClock, HiOutlineChartBar } from "react-icons/hi";
 import { FaExchangeAlt, FaMoneyBillWave, FaCog } from "react-icons/fa";
+import logo from "../assets/logoforpft.png";
 
 type Props = {
   active: string;
@@ -21,7 +22,7 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Ensure submenu opens when active view is under transactions
+  // ensure submenu opens when active view is under transactions
   useEffect(() => {
     if (active.startsWith("transactions")) setTxOpen(true);
   }, [active]);
@@ -44,27 +45,23 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
     textAlign: "left",
   });
 
-  // Hide desktop sidebar on small screens (the CSS already hides .app-sidebar at <=1000px)
-  // We still return null for very small screens to ensure no duplicate UI, but we rely on CSS rules for display.
-  // Desktop sidebar:
+  // Desktop sidebar
   const desktopSidebar = (
     <aside className="app-sidebar desktop-only" aria-hidden={isSmall}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-        <div
+        {/* Imported image badge (keeps same size & rounded corners as before) */}
+        <img
+          src={logo}
+          alt="logo"
           style={{
-            width: 40,
-            height: 40,
+            width: 60,
+            height: 60,
             borderRadius: 8,
-            background: "rgb(var(--primary-rgb))",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#fff",
-            fontWeight: 700,
+            objectFit: "cover",
+            display: "block",
           }}
-        >
-          FT
-        </div>
+        />
+
         <div style={{ fontWeight: 700, color: "rgb(var(--accent-rgb))" }}>FinanceTracker</div>
       </div>
 
@@ -78,9 +75,8 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
           <button
             style={navBtnStyle(active.startsWith("transactions"))}
             onClick={() => {
-              // open sub-menu and navigate to transaction list immediately
               setTxOpen((s) => !s);
-              onNavigate("transactions.list");
+              onNavigate("transactions.list"); // open submenu and navigate to list
             }}
             aria-expanded={txOpen}
           >
@@ -133,7 +129,7 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
     </aside>
   );
 
-  // Mobile overlay & panel are controlled by CSS classes in index.css; render regardless and CSS will show/hide.
+  // Mobile overlay & panel (uses same logo but slightly smaller)
   const mobileOverlayOpen = Boolean(isOpen);
   return (
     <>
@@ -148,9 +144,17 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between", marginBottom: 18 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgb(var(--primary-rgb))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700 }}>
-                FT
-              </div>
+              <img
+                src={logo}
+                alt="logo"
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 8,
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
               <div style={{ fontWeight: 700, color: "rgb(var(--accent-rgb))" }}>FinanceTracker</div>
             </div>
 
@@ -169,10 +173,9 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
               onClick={() => {
                 setTxOpen((s) => !s);
                 onNavigate("transactions.list");
-                // keep mobile panel open so user sees submenu (or close if desired)
               }}
             >
-              <FaExchangeAlt /> Transactions <div style={{ marginLeft: "auto", opacity: 0.75 }}>{txOpen ? "▾" : "▸"}</div>
+              <FaExchangeAlt /> Transactions
             </button>
 
             {txOpen && (
@@ -196,7 +199,6 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
             <button style={navBtnStyle(active === "reports")} onClick={() => { onNavigate("reports"); onClose?.(); }}>
               <HiOutlineChartBar /> Reports
             </button>
-
             <button style={navBtnStyle(active === "settings")} onClick={() => { onNavigate("settings"); onClose?.(); }}>
               <FaCog /> Settings
             </button>
