@@ -8,11 +8,12 @@ import rateLimit from 'express-rate-limit';
 // Swagger
 import { setupSwagger } from './swagger.js';
 
-// Correct relative imports for TS/Node ESM
+// Routes
+import authRoutes from './routes/auth.routes.js';
+import transactionRoutes from "./routes/transactions.js";
+
+// Error handler
 import { errorHandler } from './middlewares/errorHandler.js';
-import { register, login } from './controllers/authController.js';
-import { createTransaction, getTransactions, getSummary } from './controllers/transactionController.js';
-import { authenticate } from './middlewares/auth.js';
 
 const app = express();
 
@@ -24,35 +25,29 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Rate Limiting
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
+});
 app.use(limiter);
 
 // -------------------------
-// Health Check Route
+// Health Check
 // -------------------------
 app.get('/', (req, res) => {
   res.send('Personal Finance Tracker API is running 🚀');
 });
 
 // -------------------------
-// Swagger Setup
+// Swagger
 // -------------------------
 setupSwagger(app);
 
 // -------------------------
-// Auth Routes
+// Routes
 // -------------------------
-app.post('/api/auth/register', register);
-app.post('/api/auth/login', login);
-
-// -------------------------
-// Protected Transaction Routes
-// -------------------------
-app.use('/api/transactions', authenticate);
-app.post('/api/transactions', createTransaction);
-app.get('/api/transactions', getTransactions);
-app.get('/api/summary', authenticate, getSummary);
+app.use('/api/auth', authRoutes);
+app.use('/api/transactions', transactionRoutes);
 
 // -------------------------
 // Error Handling
