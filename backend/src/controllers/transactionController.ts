@@ -2,57 +2,10 @@ import type { Request, Response, NextFunction } from 'express';
 import prisma from '../lib/prisma.js';
 import { transactionSchema } from '../utils/validators.js';
 
-/**
- * @swagger
- * tags:
- *   name: Transactions
- *   description: Transaction management endpoints
- */
-
-/**
- * @swagger
- * /api/transactions:
- *   post:
- *     summary: Create a new transaction
- *     tags: [Transactions]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - amount
- *               - type
- *               - category
- *             properties:
- *               amount:
- *                 type: number
- *                 example: 500
- *               type:
- *                 type: string
- *                 enum: [INCOME, EXPENSE]
- *                 example: INCOME
- *               category:
- *                 type: string
- *                 example: Salary
- *               date:
- *                 type: string
- *                 format: date
- *                 example: 2026-02-26
- *     responses:
- *       201:
- *         description: Transaction created successfully
- *       400:
- *         description: Invalid request data
- */
 export const createTransaction = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = transactionSchema.parse(req.body);
     const userId = (req as any).user.userId;
-
     const transaction = await prisma.transaction.create({
       data: { ...data, userId, date: data.date ? new Date(data.date) : new Date() }
     });
@@ -60,20 +13,6 @@ export const createTransaction = async (req: Request, res: Response, next: NextF
   } catch (error) { next(error); }
 };
 
-/**
- * @swagger
- * /api/transactions:
- *   get:
- *     summary: Get all transactions for the logged-in user
- *     tags: [Transactions]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: List of transactions
- *       401:
- *         description: Unauthorized
- */
 export const getTransactions = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = (req as any).user.userId;
@@ -85,58 +24,142 @@ export const getTransactions = async (req: Request, res: Response, next: NextFun
   } catch (error) { next(error); }
 };
 
-/**
- * @swagger
- * /api/summary:
- *   get:
- *     summary: Get transaction summary for the logged-in user
- *     tags: [Transactions]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Transaction summary
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 totalIncome:
- *                   type: number
- *                 totalExpenses:
- *                   type: number
- *                 balance:
- *                   type: number
- *                 categoryTotals:
- *                   type: object
- *                   additionalProperties:
- *                     type: number
- *       401:
- *         description: Unauthorized
- */
 export const getSummary = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = (req as any).user.userId;
-
     const transactions = await prisma.transaction.findMany({ where: { userId } });
-
     let totalIncome = 0;
     let totalExpenses = 0;
     const categoryTotals: Record<string, number> = {};
-
     transactions.forEach(t => {
       const amount = Number(t.amount);
       if (t.type === 'INCOME') totalIncome += amount;
       if (t.type === 'EXPENSE') totalExpenses += amount;
-
       categoryTotals[t.category] = (categoryTotals[t.category] || 0) + amount;
     });
-
     res.json({
       totalIncome,
       totalExpenses,
       balance: totalIncome - totalExpenses,
       categoryTotals
     });
+  } catch (error) { next(error); }
+};
+
+/**
+ * @swagger
+ * /api/transactions/{id}:
+ *   put:
+ *     summary: Update a transaction (owner only)
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 example: 250
+ *               type:
+ *                 type: string
+ *                 enum: [INCOME, EXPENSE]
+ *                 example: EXPENSE
+ *               category:
+ *                 type: string
+ *                 example: Groceries
+ *               date:
+ *                 type: string
+ *                 format: date
+ *                 example: 2026-02-25
+ *     responses:
+ *       200:
+ *         description: Transaction updated successfully
+ *       400:
+ *         description: Invalid request data
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Transaction not found
+ */
+export const updateTransaction = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const idParam = req.params.id;
+    const id = Number(idParam);
+    if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid transaction id' });
+
+    const userId = (req as any).user.userId;
+
+    const existing = await prisma.transaction.findUnique({ where: { id } });
+    if (!existing) return res.status(404).json({ message: 'Transaction not found' });
+    if (existing.userId !== userId) return res.status(403).json({ message: 'Forbidden' });
+
+    const updateSchema = (transactionSchema as any).partial ? (transactionSchema as any).partial() : transactionSchema;
+    const data = updateSchema.parse(req.body);
+
+    const updateData: any = {};
+    if (data.amount !== undefined) updateData.amount = data.amount;
+    if (data.type !== undefined) updateData.type = data.type;
+    if (data.category !== undefined) updateData.category = data.category;
+    if (data.date !== undefined) updateData.date = data.date ? new Date(data.date) : null;
+
+    const updated = await prisma.transaction.update({
+      where: { id },
+      data: updateData
+    });
+
+    res.json(updated);
+  } catch (error) { next(error); }
+};
+
+/**
+ * @swagger
+ * /api/transactions/{id}:
+ *   delete:
+ *     summary: Delete a transaction (owner only)
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Transaction deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Transaction not found
+ */
+export const deleteTransaction = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const idParam = req.params.id;
+    const id = Number(idParam);
+    if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid transaction id' });
+
+    const userId = (req as any).user.userId;
+
+    const existing = await prisma.transaction.findUnique({ where: { id } });
+    if (!existing) return res.status(404).json({ message: 'Transaction not found' });
+    if (existing.userId !== userId) return res.status(403).json({ message: 'Forbidden' });
+
+    await prisma.transaction.delete({ where: { id } });
+    res.json({ message: 'Transaction deleted' });
   } catch (error) { next(error); }
 };
