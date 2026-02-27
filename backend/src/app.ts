@@ -6,6 +6,9 @@ import rateLimit from 'express-rate-limit';
 
 import { setupSwagger } from './swagger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { register, login } from './controllers/authController.js';
+import { createTransaction, getTransactions, getSummary, updateTransaction, deleteTransaction } from './controllers/transactionController.js';
+import { authenticate } from './middlewares/auth.js';
 import setupRoutes from './routes.js';
 
 const app = express();

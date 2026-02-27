@@ -1,9 +1,7 @@
-// src/components/Sidebar.tsx
 import React, { useEffect, useState } from "react";
 import { HiOutlineHome, HiOutlineClock, HiOutlineChartBar } from "react-icons/hi";
 import { FaExchangeAlt, FaMoneyBillWave, FaCog } from "react-icons/fa";
 import logo from "../assets/logoforft.png";
-import { useSummaryQuery, queryErrorToMessage } from "../features/transactions/queries";
 
 type Props = {
   active: string;
@@ -15,12 +13,6 @@ type Props = {
 export default function Sidebar({ active, onNavigate, isOpen = false, onClose }: Props) {
   const [txOpen, setTxOpen] = useState<boolean>(false);
   const [isSmall, setIsSmall] = useState<boolean>(false);
-
-  // summary data for overview (income / expenses / balance)
-  const { data, isLoading, isError, error } = useSummaryQuery();
-  const totalIncome = data?.totalIncome ?? 0;
-  const totalExpenses = data?.totalExpenses ?? 0;
-  const balance = data?.balance ?? 0;
 
   useEffect(() => {
     const onResize = () => setIsSmall(window.innerWidth <= 1000);
@@ -50,53 +42,6 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
     width: "100%",
     textAlign: "left",
   });
-
-  const renderOverviewValue = () => {
-    if (isLoading) {
-      return (
-        <div
-          style={{
-            fontSize: 18,
-            fontWeight: 700,
-            marginTop: 6,
-            color: "rgba(var(--accent-rgb),0.75)",
-          }}
-        >
-          Loading…
-        </div>
-      );
-    }
-
-    if (isError) {
-      return (
-        <div
-          style={{
-            fontSize: 13,
-            marginTop: 6,
-            color: "#b91c1c",
-            maxWidth: 220,
-            lineHeight: 1.2,
-          }}
-        >
-          {queryErrorToMessage(error)}
-        </div>
-      );
-    }
-
-    return (
-      <div
-        style={{
-          fontSize: 26,
-          fontWeight: 800,
-          marginTop: 6,
-          color: "rgb(var(--accent-rgb))",
-        }}
-        aria-live="polite"
-      >
-        ${Number(balance).toLocaleString()}
-      </div>
-    );
-  };
 
   const desktopSidebar = (
     <aside className="app-sidebar desktop-only" aria-hidden={isSmall}>
@@ -179,7 +124,7 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
 
       <div style={{ marginTop: 12 }}>
         <div style={{ color: "rgba(var(--accent-rgb), 0.9)", fontSize: 13 }}>Overview of your finances</div>
-        {renderOverviewValue()}
+        <div style={{ fontSize: 26, fontWeight: 800, marginTop: 6, color: "rgb(var(--accent-rgb))" }}>$12,345</div>
       </div>
     </aside>
   );
@@ -218,16 +163,7 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
             </div>
 
             <div>
-              <button
-                onClick={() => {
-                  onNavigate("home");
-                  onClose?.();
-                }}
-                style={{ marginRight: 8 }}
-                aria-label="Home"
-              >
-                Home
-              </button>
+              <button onClick={() => { onNavigate("home"); onClose?.(); }} style={{ marginRight: 8 }} aria-label="Home">Home</button>
             </div>
           </div>
 
@@ -274,7 +210,7 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose }:
 
           <div style={{ marginTop: 12 }}>
             <div style={{ color: "rgba(var(--accent-rgb), 0.9)", fontSize: 13 }}>Overview of your finances</div>
-            {renderOverviewValue()}
+            <div style={{ fontSize: 26, fontWeight: 800, marginTop: 6, color: "rgb(var(--accent-rgb))" }}>$12,345</div>
           </div>
         </aside>
       </div>

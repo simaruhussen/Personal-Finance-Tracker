@@ -52,7 +52,7 @@ export default function RecentTransactionsCard() {
                   color: "rgb(var(--accent-rgb))",
                 }}
               >
-                {t.amount >= 0 ? `birr ${Math.abs(t.amount).toLocaleString()}` : `birr ${Math.abs(t.amount).toLocaleString()}`}
+                {t.amount >= 0 ? `+$${Math.abs(t.amount).toLocaleString()}` : `-$${Math.abs(t.amount).toLocaleString()}`}
               </div>
               <div style={{ marginLeft: 12 }}>
                 <span
