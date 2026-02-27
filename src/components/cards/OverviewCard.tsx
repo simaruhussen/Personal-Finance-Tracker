@@ -48,21 +48,21 @@ export default function OverviewCard() {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, color: "rgba(var(--accent-rgb),0.75)" }}>Income</div>
             <div style={{ fontSize: 20, fontWeight: 800, marginTop: 4, color: "rgb(var(--secondary-rgb))" }}>
-              {totalIncome.toLocaleString()} birr
+              ${totalIncome.toLocaleString()}
             </div>
           </div>
 
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, color: "rgba(var(--accent-rgb),0.75)" }}>Expenses</div>
             <div style={{ fontSize: 20, fontWeight: 800, marginTop: 4, color: "rgba(255,80,80,1)" }}>
-              {totalExpenses.toLocaleString()} birr
+              ${totalExpenses.toLocaleString()}
             </div>
           </div>
 
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, color: "rgba(var(--accent-rgb),0.75)" }}>Balance</div>
             <div style={{ fontSize: 20, fontWeight: 800, marginTop: 4, color: "rgb(var(--accent-rgb))" }}>
-              {balance.toLocaleString()} birr
+              ${balance.toLocaleString()}
             </div>
           </div>
         </div>

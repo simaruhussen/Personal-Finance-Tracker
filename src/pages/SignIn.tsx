@@ -132,9 +132,18 @@ export default function SignIn(): JSX.Element {
             )}
           </div>
 
-          
+          <div style={{ width: "100%", display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+            <button
+              type="button"
+              onClick={() => alert("Forgot password flow (not implemented)")}
+              className="auth-ghost"
+              style={{ padding: "8px 12px", borderRadius: 16, color: "rgb(var(--accent-rgb))" }}
+            >
+              Forgot?
+            </button>
+          </div>
 
-          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: 24 }}>
+          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: 8 }}>
             <button
               type="submit"
               className="auth-btn"
