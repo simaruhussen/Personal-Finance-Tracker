@@ -46,53 +46,8 @@ export const getSummary = async (req: Request, res: Response, next: NextFunction
   } catch (error) { next(error); }
 };
 
-/**
- * @swagger
- * /api/transactions/{id}:
- *   put:
- *     summary: Update a transaction (owner only)
- *     tags: [Transactions]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               amount:
- *                 type: number
- *                 example: 250
- *               type:
- *                 type: string
- *                 enum: [INCOME, EXPENSE]
- *                 example: EXPENSE
- *               category:
- *                 type: string
- *                 example: Groceries
- *               date:
- *                 type: string
- *                 format: date
- *                 example: 2026-02-25
- *     responses:
- *       200:
- *         description: Transaction updated successfully
- *       400:
- *         description: Invalid request data
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Transaction not found
- */
+
+
 export const updateTransaction = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Accept id from URL param or request body (some clients may send id in body)
@@ -125,30 +80,6 @@ export const updateTransaction = async (req: Request, res: Response, next: NextF
   } catch (error) { next(error); }
 };
 
-/**
- * @swagger
- * /api/transactions/{id}:
- *   delete:
- *     summary: Delete a transaction (owner only)
- *     tags: [Transactions]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Transaction deleted successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Transaction not found
- */
 export const deleteTransaction = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Accept id from URL param or request body (some clients may send id in body)
