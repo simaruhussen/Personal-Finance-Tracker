@@ -1,8 +1,10 @@
 import React from "react";
 import { useSummaryQuery, queryErrorToMessage } from "../../features/transactions/queries";
+import QueryLoadingState from "../ui/QueryLoadingState";
+import QueryErrorState from "../ui/QueryErrorState";
 
 export default function OverviewCard() {
-  const { data, isLoading, isError, error } = useSummaryQuery();
+  const { data, isLoading, isError, error, refetch } = useSummaryQuery();
 
   const totalIncome = data?.totalIncome ?? 0;
   const totalExpenses = data?.totalExpenses ?? 0;
@@ -29,18 +31,14 @@ export default function OverviewCard() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "rgba(var(--accent-rgb),0.45)",
-            fontSize: 13,
           }}
         >
-          Loading summary…
+          <QueryLoadingState message="Loading summary…" />
         </div>
       )}
 
       {isError && (
-        <div style={{ color: "#b91c1c", fontSize: 13 }}>
-          {queryErrorToMessage(error)}
-        </div>
+        <QueryErrorState message={queryErrorToMessage(error)} onRetry={() => refetch()} />
       )}
 
       {!isLoading && !isError && (

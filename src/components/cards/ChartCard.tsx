@@ -1,11 +1,14 @@
 import React, { useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useSummaryQuery, queryErrorToMessage } from "../../features/transactions/queries";
+import QueryLoadingState from "../ui/QueryLoadingState";
+import QueryErrorState from "../ui/QueryErrorState";
+import QueryEmptyState from "../ui/QueryEmptyState";
 
 const COLORS = ["rgba(134,173,15,1)", "rgba(223,203,93,1)", "rgba(64,63,62,0.9)", "rgba(105,125,20,1)"];
 
 export default function ChartCard() {
-  const { data, isLoading, isError, error } = useSummaryQuery();
+  const { data, isLoading, isError, error, refetch } = useSummaryQuery();
 
   const chartData = useMemo(
     () =>
@@ -22,18 +25,14 @@ export default function ChartCard() {
     <div className="card">
       <h4 style={{ margin: 0, fontWeight: 700, marginBottom: 10 }}>By Category</h4>
 
-      {isLoading && (
-        <div style={{ padding: 8, color: "rgba(var(--accent-rgb),0.6)", fontSize: 13 }}>Loading chart…</div>
-      )}
+      {isLoading && <QueryLoadingState message="Loading chart…" />}
 
       {isError && (
-        <div style={{ padding: 8, color: "#b91c1c", fontSize: 13 }}>{queryErrorToMessage(error)}</div>
+        <QueryErrorState message={queryErrorToMessage(error)} onRetry={() => refetch()} />
       )}
 
       {!isLoading && !isError && chartData.length === 0 && (
-        <div style={{ padding: 8, color: "rgba(var(--accent-rgb),0.7)", fontSize: 13 }}>
-          No category data yet.
-        </div>
+        <QueryEmptyState message="No category data yet." />
       )}
 
       {!isLoading && !isError && chartData.length > 0 && (

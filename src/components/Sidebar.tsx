@@ -27,7 +27,7 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose, o
   const [isSmall, setIsSmall] = useState<boolean>(false);
 
   // summary data for overview (income / expenses / balance)
-  const { data, isLoading, isError, error } = useSummaryQuery();
+  const { data, isLoading, isError, error, refetch } = useSummaryQuery();
   const balance = data?.balance ?? 0;
 
   // theme state (keeps same persistence as Header via THEME_KEY)
@@ -108,6 +108,14 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose, o
           }}
         >
           {queryErrorToMessage(error)}
+          <button
+            type="button"
+            className="auth-ghost"
+            style={{ marginTop: 8, display: "block" }}
+            onClick={() => refetch()}
+          >
+            Retry
+          </button>
         </div>
       );
     }

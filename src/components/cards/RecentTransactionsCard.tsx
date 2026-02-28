@@ -1,8 +1,11 @@
 import React, { useMemo } from "react";
 import { useTransactionsQuery, queryErrorToMessage } from "../../features/transactions/queries";
+import QueryLoadingState from "../ui/QueryLoadingState";
+import QueryErrorState from "../ui/QueryErrorState";
+import QueryEmptyState from "../ui/QueryEmptyState";
 
 export default function RecentTransactionsCard() {
-  const { data = [], isLoading, isError, error } = useTransactionsQuery();
+  const { data = [], isLoading, isError, error, refetch } = useTransactionsQuery();
 
   const recent = useMemo(
     () => data.slice(0, 5),
@@ -15,22 +18,14 @@ export default function RecentTransactionsCard() {
         Recent Transactions
       </h3>
 
-      {isLoading && (
-        <div style={{ padding: 8, color: "rgba(var(--accent-rgb),0.6)", fontSize: 13 }}>
-          Loading…
-        </div>
-      )}
+      {isLoading && <QueryLoadingState />}
 
       {isError && (
-        <div style={{ padding: 8, color: "#b91c1c", fontSize: 13 }}>
-          {queryErrorToMessage(error)}
-        </div>
+        <QueryErrorState message={queryErrorToMessage(error)} onRetry={() => refetch()} />
       )}
 
       {!isLoading && !isError && recent.length === 0 && (
-        <div style={{ padding: 8, color: "rgba(var(--accent-rgb),0.7)", fontSize: 13 }}>
-          No transactions yet.
-        </div>
+        <QueryEmptyState message="No transactions yet." />
       )}
 
       {!isLoading && !isError && recent.length > 0 && (

@@ -5,6 +5,7 @@ import type { DashboardOutletContext } from "./Dashboard";
 import type { Transaction } from "../lib/types";
 import { useTransactionsQuery } from "../features/transactions/queries";
 import { useCreateTransactionMutation, useUpdateTransactionMutation, mutationErrorToMessage } from "../features/transactions/mutations";
+import QueryErrorState from "../components/ui/QueryErrorState";
 
 type LocationState = {
   editId?: string;
@@ -30,26 +31,24 @@ export default function AddTransactionRoute() {
       updateMutation
         .mutateAsync({ id: payload.id, input: payload })
         .then(() => navigate("/transactions"))
-        .catch(() => {
-          /* errors surfaced via mutationErrorToMessage */
-        });
+        .catch(() => {});
     } else {
       createMutation
         .mutateAsync(payload)
         .then(() => navigate("/transactions"))
-        .catch(() => {
-          /* errors surfaced via mutationErrorToMessage */
-        });
+        .catch(() => {});
     }
   };
+
+  const saveError = createMutation.error ?? updateMutation.error;
 
   if (!currentUser) return null;
 
   return (
     <>
-      {createMutation.error && (
-        <div style={{ color: "#b91c1c", fontSize: 13, marginBottom: 8 }}>
-          {mutationErrorToMessage(createMutation.error)}
+      {saveError && (
+        <div style={{ marginBottom: 8 }}>
+          <QueryErrorState message={mutationErrorToMessage(saveError)} />
         </div>
       )}
       <AddTransaction

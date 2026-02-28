@@ -1,9 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createTransaction } from "../../api/transactions";
+import { createTransaction, deleteTransaction, updateTransaction } from "../../api/transactions";
 import { getErrorMessage } from "../../api/errors";
 import { SUMMARY_KEY, TRANSACTIONS_KEY } from "./queries";
 import { uiToCreateRequest, type UiCreateTransactionInput } from "./mappers";
-import { http } from "../../api/http";
 import type { Transaction } from "./types";
 
 export function useCreateTransactionMutation() {
@@ -30,7 +29,7 @@ export function useDeleteTransactionMutation() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await http.delete(`/api/transactions/${encodeURIComponent(id)}`);
+      await deleteTransaction(id);
     },
     onMutate: async (id: string) => {
       await queryClient.cancelQueries({ queryKey: TRANSACTIONS_KEY });
@@ -58,8 +57,7 @@ export function useUpdateTransactionMutation() {
   return useMutation({
     mutationFn: async ({ id, input }: { id: string; input: UiCreateTransactionInput }) => {
       const payload = uiToCreateRequest(input);
-      const res = await http.put(`/api/transactions/${encodeURIComponent(id)}`, payload);
-      return res.data;
+      return await updateTransaction(id, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEY });
