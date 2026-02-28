@@ -430,6 +430,16 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose, o
                 </button>
               </div>
             )}
+
+            <button
+              style={navBtnStyle(active === "reports")}
+              onClick={() => {
+                onNavigate("reports");
+                onClose?.();
+              }}
+            >
+              <HiOutlineChartBar /> Reports
+            </button>
           </nav>
 
           {/* Settings button + inline subpanel for mobile */}

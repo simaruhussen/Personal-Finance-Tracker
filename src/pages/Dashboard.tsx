@@ -31,6 +31,7 @@ export default function Dashboard() {
     if (path === "/transactions") return "transactions.list";
     if (path === "/transactions/new") return "transactions.add";
     if (path.startsWith("/transactions/")) return "transactions.list";
+    if (path === "/reports") return "reports";
     return "home";
   }, [location.pathname]);
 
@@ -40,6 +41,7 @@ export default function Dashboard() {
     else if (key === "transactions") navigate("/transactions");
     else if (key === "transactions.list") navigate("/transactions");
     else if (key === "transactions.add") navigate("/transactions/new");
+    else if (key === "reports") navigate("/reports");
     else navigate("/");
   };
 

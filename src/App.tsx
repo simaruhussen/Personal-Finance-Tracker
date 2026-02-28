@@ -7,6 +7,7 @@ import DashboardHome from "./pages/DashboardHome";
 import TransactionsRoute from "./pages/TransactionsRoute";
 import AddTransactionRoute from "./pages/AddTransactionRoute";
 import TransactionDetailRoute from "./pages/TransactionDetailRoute";
+import ReportsRoute from "./pages/ReportsRoute";
 import ProtectedRoute from "./features/auth/ProtectedRoute";
 
 export default function App(): JSX.Element {
@@ -21,6 +22,7 @@ export default function App(): JSX.Element {
           <Route path="transactions" element={<TransactionsRoute />} />
           <Route path="transactions/new" element={<AddTransactionRoute />} />
           <Route path="transactions/:id" element={<TransactionDetailRoute />} />
+          <Route path="reports" element={<ReportsRoute />} />
         </Route>
       </Route>
 

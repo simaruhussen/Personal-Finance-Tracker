@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express';
 import { register, login } from './controllers/authController.js';
 import { createTransaction, getTransactions, getSummary, updateTransaction, deleteTransaction } from './controllers/transactionController.js';
+import { getAccounts, upsertAccounts } from './controllers/accountController.js';
 import { authenticate } from './middlewares/auth.js';
 
 export default function setupRoutes(app: Application) {
@@ -22,5 +23,10 @@ export default function setupRoutes(app: Application) {
 
   // summary
   app.get('/api/summary', authenticate, getSummary);
+
+  // accounts (checking / savings / cash)
+  app.use('/api/accounts', authenticate);
+  app.get('/api/accounts', getAccounts);
+  app.put('/api/accounts', upsertAccounts);
 }
 
