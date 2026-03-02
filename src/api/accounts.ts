@@ -1,3 +1,4 @@
+// src/api/accounts.ts
 import { http } from "./http";
 
 export type ApiAccount = {
@@ -26,4 +27,3 @@ export async function upsertAccounts(payload: UpsertAccountsRequest): Promise<Ap
   const res = await http.put<ApiAccount[]>("/api/accounts", payload);
   return res.data;
 }
-

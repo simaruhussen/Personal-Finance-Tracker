@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import { useAuth } from "../features/auth/AuthProvider";
 import type { User } from "../features/auth/types";
+import { DateRangeProvider } from "../features/dashboard/DateRangeContext";
 
 export type DashboardOutletContext = {
   currentUser: User;
@@ -20,7 +21,9 @@ export default function Dashboard() {
 
   // close sidebar with Escape
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSidebarOpen(false); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSidebarOpen(false);
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
@@ -48,22 +51,24 @@ export default function Dashboard() {
   if (!user) return null;
 
   return (
-    <div className="app-root" role="application">
-      {/* Sidebar is fixed by CSS; pass mobile open/close props for overlay panel */}
-      <Sidebar active={activeSidebarKey} onNavigate={handleNavigate} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <DateRangeProvider>
+      <div className="app-root" role="application">
+        {/* Sidebar is fixed by CSS; pass mobile open/close props for overlay panel */}
+        <Sidebar active={activeSidebarKey} onNavigate={handleNavigate} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onLogout={logout} />
 
-      {/* Right content area: header (sticky) + main (scrollable) */}
-      <div className="app-right">
-        <header className="app-header">
-          <Header currentUser={user} onLogout={logout} onToggleSidebar={() => setSidebarOpen((s) => !s)} sidebarOpen={sidebarOpen} />
-        </header>
+        {/* Right content area: header (sticky) + main (scrollable) */}
+        <div className="app-right">
+          <header className="app-header">
+            <Header currentUser={user} onLogout={logout} onToggleSidebar={() => setSidebarOpen((s) => !s)} sidebarOpen={sidebarOpen} />
+          </header>
 
-        <main className="app-main">
-          <div style={{ width: "100%", maxWidth: 1200 }}>
-            <Outlet context={{ currentUser: user } satisfies DashboardOutletContext} />
-          </div>
-        </main>
+          <main className="app-main">
+            <div style={{ width: "100%", maxWidth: 1200 }}>
+              <Outlet context={{ currentUser: user } satisfies DashboardOutletContext} />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </DateRangeProvider>
   );
 }

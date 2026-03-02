@@ -9,7 +9,7 @@ import {
 } from "react-icons/hi";
 import { FaExchangeAlt, FaMoneyBillWave, FaCog } from "react-icons/fa";
 import logo from "../assets/logoforft.png";
-import { useSummaryQuery, queryErrorToMessage } from "../features/transactions/queries";
+import { useAccountsQuery, queryErrorToMessage } from "../features/accounts/queries";
 
 type Props = {
   active: string;
@@ -26,9 +26,12 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose, o
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
   const [isSmall, setIsSmall] = useState<boolean>(false);
 
-  // summary data for overview (income / expenses / balance)
-  const { data, isLoading, isError, error, refetch } = useSummaryQuery();
-  const balance = data?.balance ?? 0;
+  // accounts data for sidebar balance
+  const { data: accounts, isLoading, isError, error, refetch } = useAccountsQuery();
+  const totalBalance = React.useMemo(() => {
+    if (!accounts) return 0;
+    return accounts.reduce((sum, a) => sum + Number(a.balance ?? 0), 0);
+  }, [accounts]);
 
   // theme state (keeps same persistence as Header via THEME_KEY)
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -130,7 +133,7 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose, o
         }}
         aria-live="polite"
       >
-        birr {Number(balance).toLocaleString()}
+        birr {Number(totalBalance).toLocaleString()}
       </div>
     );
   };
@@ -156,7 +159,6 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose, o
     }
   };
 
-  // Settings subpanel: small inline UI shown beneath Settings button only
   const SettingsSubpanel = ({ compact = false }: { compact?: boolean }) => (
     <div
       role="group"

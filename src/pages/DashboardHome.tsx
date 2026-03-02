@@ -1,31 +1,30 @@
 // src/pages/DashboardHome.tsx
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useOutletContext } from "react-router-dom";
 import AccountsCard from "../components/cards/AccountsCard";
 import RecentTransactionsCard from "../components/cards/RecentTransactionsCard";
 import OverviewCard from "../components/cards/OverviewCard";
 import ChartCard from "../components/cards/ChartCard";
 import QuickLinksCard from "../components/cards/QuickLinksCard";
+import DateRangeFilter from "../components/ui/DateRangeFilter";
+import { useDateRange } from "../features/dashboard/DateRangeContext";
 import type { DashboardOutletContext } from "./Dashboard";
 
 function useIsSmall(breakpoint = 720) {
-  const [isSmall, setIsSmall] = useState<boolean>(() => {
+  const [isSmall, setIsSmall] = React.useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return window.innerWidth <= breakpoint;
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (typeof window === "undefined") return;
     const mql = window.matchMedia(`(max-width: ${breakpoint}px)`);
-
-    const update = () => setIsSmall(mql.matches);
-    update();
-
     const handler = (e: MediaQueryListEvent | MediaQueryList) => {
       const matches = "matches" in e ? e.matches : mql.matches;
       setIsSmall(Boolean(matches));
     };
 
+    handler(mql);
     if (mql.addEventListener) mql.addEventListener("change", handler as EventListener);
     else mql.addListener(handler as any);
 
@@ -41,6 +40,7 @@ function useIsSmall(breakpoint = 720) {
 export default function DashboardHome() {
   const { currentUser } = useOutletContext<DashboardOutletContext>();
   const isSmall = useIsSmall(720);
+  const { preset, setPreset, presetLabel } = useDateRange();
 
   // responsive grid styles: desktop shows 3 columns; mobile collapses to single column
   const outerGridStyle: React.CSSProperties = {
@@ -64,9 +64,16 @@ export default function DashboardHome() {
 
   return (
     <>
-      <h2 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 16px 0", color: "rgb(var(--accent-rgb))" }}>
-        Welcome back, {currentUser.fullName || currentUser.email}!
-      </h2>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+        <h2 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: "rgb(var(--accent-rgb))" }}>
+          Welcome back, {currentUser.fullName || currentUser.email}!
+        </h2>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ color: "rgba(0,0,0,0.6)", fontSize: 13, marginRight: 8 }}>{presetLabel}</div>
+          <DateRangeFilter value={preset} onChange={setPreset} />
+        </div>
+      </div>
 
       <div style={outerGridStyle}>
         <div style={leftColumnStyle}>
