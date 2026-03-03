@@ -12,7 +12,7 @@ export default function ReportsRoute() {
           color: "rgb(var(--accent-rgb))",
         }}
       >
-        Reports
+        Accounts
       </h2>
 
       <p
@@ -23,8 +23,7 @@ export default function ReportsRoute() {
           maxWidth: 520,
         }}
       >
-        Edit the balances of your main accounts (checking, savings, and cash). Your total balance will update automatically based on
-        these values.
+        Edit the balances of your main accounts.
       </p>
 
       <div style={{ maxWidth: 520 }}>

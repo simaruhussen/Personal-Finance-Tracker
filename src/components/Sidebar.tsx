@@ -328,7 +328,7 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose, o
         </div>
 
         <button style={navBtnStyle(active === "reports")} onClick={() => onNavigate("reports")}>
-          <HiOutlineChartBar /> Reports
+          <HiOutlineChartBar /> Accounts
         </button>
 
         <div>
@@ -448,7 +448,7 @@ export default function Sidebar({ active, onNavigate, isOpen = false, onClose, o
                 onClose?.();
               }}
             >
-              <HiOutlineChartBar /> Reports
+              <HiOutlineChartBar /> Accounts
             </button>
           </nav>
 
