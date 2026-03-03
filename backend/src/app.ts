@@ -15,8 +15,13 @@ const app = express();
 const allowedOrigin = process.env.CORS_ORIGIN;
 
 app.use(helmet());
-app.use(cors(allowedOrigin ? { origin: allowedOrigin, credentials: true } : undefined));
-app.use(express.json());
+app.use(cors({
+  origin: [
+    'https://personal-finance-tracker-mocha-tau.vercel.app/register', // Your NEW Vercel URL
+    'http://localhost:5173'                // Keep this for local testing
+  ],
+  credentials: true
+}));app.use(express.json());
 app.use(morgan('dev'));
 
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
