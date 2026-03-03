@@ -79,7 +79,7 @@ export default function SignUp(): JSX.Element {
         email: data.email,
         password: data.password,
       });
-      navigate("/", { replace: true });
+      navigate("/login", { replace: true });
     } catch (err) {
       // Attempt to use centralized mapper first, but still parse common shapes here
       try {
