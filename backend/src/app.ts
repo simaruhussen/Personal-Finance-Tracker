@@ -17,7 +17,7 @@ const allowedOrigin = process.env.CORS_ORIGIN;
 app.use(helmet());
 app.use(cors({
   origin: [
-    'https://personal-finance-tracker-mocha-tau.vercel.app/register', // Your NEW Vercel URL
+    'https://personal-finance-tracker-mocha-tau.vercel.app', // Your NEW Vercel URL
     'http://localhost:5173'                // Keep this for local testing
   ],
   credentials: true
