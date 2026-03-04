@@ -56,9 +56,7 @@ export default function Header({ currentUser, onLogout, onToggleSidebar, sidebar
         </button>
       )}
 
-      {/* We removed the left brand (FT + FinanceTracker) per request. */}
 
-      {/* fill space before right-side controls */}
       <div style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
         {/* desktop-only controls (user, notifications, settings) */}
         <div className="desktop-only" style={{ display: "flex", gap: 12, alignItems: "center" }}>
